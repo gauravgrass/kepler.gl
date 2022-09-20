@@ -1,25 +1,178 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import keplerGlReducer from "kepler.gl/reducers";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import { taskMiddleware } from "react-palm/tasks";
+import { Provider, useDispatch } from "react-redux";
+import KeplerGl, {Layer} from "kepler.gl";
+import { addDataToMap, toggleFullScreen } from "kepler.gl/actions";
+import useSwr from "swr";
+import { pointLayerConfig } from "./pointLayerConfig";
+import {hexLayerConfig} from "./hexLayerConfig"
+import {latLngToCell} from "h3-js";
+import {clusterLayerConfig} from "./clusterLayerConfig"
+import {H3Layer, LineLayer} from "kepler.gl/layers";
+// import {MapControlFactory} from './map/map-control';
+import {connect} from 'react-redux';
+import {lineLayerConfig} from './lineLayerConfig';
 
-function App() {
+
+const keplerReducer = keplerGlReducer.initialState({
+  uiState: {
+      activeSidePanel: null,  
+      currentModal: null,
+      mapControls: {
+        visibleLayers: {
+          show: false
+        },
+        mapLegend: {
+          show: false,
+          active: false
+        },
+        toggle3d: {
+          show: false
+        },
+        splitMap: {
+          show: false
+        }
+      }    
+  }
+});
+const reducers = combineReducers({
+  keplerGl: keplerReducer
+});
+
+const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
+
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <Map />
+    </Provider>
   );
 }
 
-export default App;
+function Map() {
+  const dispatch = useDispatch();
+  // const { data } = useSwr("covid", async () => {
+  //   const response = await fetch(
+  //     "https://json.extendsclass.com/bin/7a09b5ee4f37"
+  //   );
+  //   const data = await response.json();
+  //   console.log(data, response);
+  //   return data;
+  // });
+
+  // function example(lat, lng) {
+  //   const res = 2;
+  //   return latLngToCell(lat, lng, res);
+  // }
+
+  // console.log(example(28.644800, 77.216721));
+  // console.log(example(31.104605, 77.173424));
+
+  const sampleTripData = {
+    // fields: [
+    //   {name: 'country', format: '', type: 'string'},
+    //   {name: 'state', format: '', type: 'string'},
+    //   {name: 'point_latitude', format: '', type: 'real'},
+    //   {name: 'point_logitude', format: '', type: 'real'},
+    //   {name: 'hexagon_id', format: '', type: 'string'}
+    // ],
+    // rows: [
+    //   ['India','Delhi',28.644800,77.216721,'823da7fffffffff'],
+    //   ['India', 'Shimla', 31.104605, 77.173424,'823d17fffffffff']
+    // ],
+    fields: [
+      // {name: 'country', format: '', type: 'string'},
+      {name: 'from_state', format: '', type: 'string'},
+      {name: 'source_lat', format: '', type: 'real'},
+      {name: 'source_lng', format: '', type: 'real'},
+      {name: 'to_state', format: '', type: 'string'},
+      {name: 'target_lat', format: '', type: 'real'},
+      {name: 'target_lng', format: '', type: 'real'},
+    ],
+    rows: [
+      ['Delhi',28.644800,77.216721,'Shimla', 31.104605, 77.173424]
+    ]
+  };
+
+  const mapStyles = [
+    {
+      id: 'my_dark_map',
+      label: 'Dark Streets 9',
+      url: 'mapbox://styles/mapbox/dark-v9',
+      icon: `https://d1a3f4spazzrp4.cloudfront.net/kepler.gl/icons/svg-icons.json`,
+      // layerGroups: [
+      //   {
+      //     slug: 'label',
+      //     filter: ({id}) => id.match(/(?=(label|place-|poi-))/),
+      //     defaultVisibility: true
+      //   },
+      // ]
+    }
+  ];
+
+  React.useEffect(() => {
+    // console.log(data);
+    if (sampleTripData) {
+      dispatch(
+        addDataToMap({
+          datasets: {
+            info: {
+              label: "Covid_19",
+              id: "covid_19_data"
+            },
+            data: sampleTripData,
+          },
+          option: {
+            centerMap: false,
+          },
+          config: {
+            visState: {
+              // filters: [],
+              layers: [hexLayerConfig, lineLayerConfig],
+              // layers:[
+              //   {
+              //     id: 'h3-layer-1',
+              //     type: 'hexagonId',
+              //     config: {
+              //       dataId: csvDataId,
+              //       label: 'H3 Hexagon 1',
+              //       color: [
+              //         201,
+              //         23,
+              //         23
+              //     ],
+              //       columns: {hex_id: 'hex_id'},
+              //       isVisible: true
+              //     }
+              //   }
+              // ]
+              // layerBlending: "subtractive"
+          }
+          }
+        })
+      );
+    }
+  }, []);
+
+  // console.log(KeplerGlSchema);
+  return (
+    <div>
+      <button onClick={() => toggleFullScreen()}>
+      click</button>
+      <KeplerGl
+      id="covid"
+      mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+      width={window.innerWidth}
+      height={window.innerHeight}
+      // mapStyles={mapStyles}
+      appName="Grassdoor"
+      version=""
+      // mapStylesReplaceDefault={true}
+    />
+    </div>
+    
+  );
+}
