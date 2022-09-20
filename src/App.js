@@ -130,26 +130,7 @@ function Map() {
           },
           config: {
             visState: {
-              // filters: [],
               layers: [hexLayerConfig, lineLayerConfig],
-              // layers:[
-              //   {
-              //     id: 'h3-layer-1',
-              //     type: 'hexagonId',
-              //     config: {
-              //       dataId: csvDataId,
-              //       label: 'H3 Hexagon 1',
-              //       color: [
-              //         201,
-              //         23,
-              //         23
-              //     ],
-              //       columns: {hex_id: 'hex_id'},
-              //       isVisible: true
-              //     }
-              //   }
-              // ]
-              // layerBlending: "subtractive"
           }
           }
         })
@@ -157,7 +138,6 @@ function Map() {
     }
   }, []);
 
-  // console.log(KeplerGlSchema);
   return (
     <div>
       <button onClick={() => toggleFullScreen()}>
@@ -167,10 +147,8 @@ function Map() {
       mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
       width={window.innerWidth}
       height={window.innerHeight}
-      // mapStyles={mapStyles}
       appName="Grassdoor"
       version=""
-      // mapStylesReplaceDefault={true}
     />
     </div>
     
