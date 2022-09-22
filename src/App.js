@@ -14,7 +14,8 @@ import {H3Layer, LineLayer} from "kepler.gl/layers";
 // import {MapControlFactory} from './map/map-control';
 import {connect} from 'react-redux';
 import {lineLayerConfig} from './lineLayerConfig';
-
+import {iconLayerCofig} from './iconLayerCofig';
+// import {targetIconLayerConfig} from './targetIconLayerConfig';
 
 const keplerReducer = keplerGlReducer.initialState({
   uiState: {
@@ -88,12 +89,15 @@ function Map() {
       {name: 'from_state', format: '', type: 'string'},
       {name: 'source_lat', format: '', type: 'real'},
       {name: 'source_lng', format: '', type: 'real'},
+      {name: 'icon', format:'', type:'string'},
       {name: 'to_state', format: '', type: 'string'},
       {name: 'target_lat', format: '', type: 'real'},
       {name: 'target_lng', format: '', type: 'real'},
+      {name: 'hexagon_id', format: '', type: 'string'}
     ],
     rows: [
-      ['Delhi',28.644800,77.216721,'Shimla', 31.104605, 77.173424]
+      ['Delhi',28.644800,77.216721,"car",'Shimla', 31.104605, 77.173424,'823da7fffffffff'],
+      ['Shimla', 31.104605, 77.173424,"place",'Delhi',28.644800,77.216721,'823d17fffffffff']
     ]
   };
 
@@ -130,7 +134,7 @@ function Map() {
           },
           config: {
             visState: {
-              layers: [hexLayerConfig, lineLayerConfig],
+              layers: [iconLayerCofig ,hexLayerConfig, lineLayerConfig],
           }
           }
         })
@@ -149,6 +153,8 @@ function Map() {
       height={window.innerHeight}
       appName="Grassdoor"
       version=""
+      // mapStyles={mapStyles}
+      // mapStylesReplaceDefault={true} 
     />
     </div>
     
