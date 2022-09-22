@@ -1,4 +1,4 @@
-export const iconLayerCofig = {
+export const iconLayerConfig = {
     type: 'icon',
     config: {
       dataId: 'covid_19_data',

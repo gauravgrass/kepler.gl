@@ -14,7 +14,7 @@ import {H3Layer, LineLayer} from "kepler.gl/layers";
 // import {MapControlFactory} from './map/map-control';
 import {connect} from 'react-redux';
 import {lineLayerConfig} from './lineLayerConfig';
-import {iconLayerCofig} from './iconLayerCofig';
+import {iconLayerConfig} from './iconLayerConfig';
 // import {targetIconLayerConfig} from './targetIconLayerConfig';
 
 const keplerReducer = keplerGlReducer.initialState({
@@ -134,7 +134,7 @@ function Map() {
           },
           config: {
             visState: {
-              layers: [iconLayerCofig ,hexLayerConfig, lineLayerConfig],
+              layers: [iconLayerConfig ,hexLayerConfig, lineLayerConfig],
           }
           }
         })
