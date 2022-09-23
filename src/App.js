@@ -16,6 +16,9 @@ import {connect} from 'react-redux';
 import {lineLayerConfig} from './lineLayerConfig';
 import {iconLayerConfig} from './iconLayerConfig';
 // import {targetIconLayerConfig} from './targetIconLayerConfig';
+import {updateMap} from 'kepler.gl/actions'
+// import {StyledLayerPanelHeader} from 'kepler.gl/src/components/side-panel/layer-panel/layer-panel-header';
+import './Button.css';
 
 const keplerReducer = keplerGlReducer.initialState({
   uiState: {
