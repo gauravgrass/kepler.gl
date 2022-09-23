@@ -96,10 +96,12 @@ function Map() {
       {name: 'to_state', format: '', type: 'string'},
       {name: 'target_lat', format: '', type: 'real'},
       {name: 'target_lng', format: '', type: 'real'},
-      {name: 'hexagon_id', format: '', type: 'string'}
+      {name: 'hexagon_id', format: '', type: 'string'},
+      {name: 'lat', format: '', type: 'real'},
+      {name: 'lng', format: '', type: 'real'},
     ],
     rows: [
-      ['Delhi',28.644800,77.216721,"car",'Shimla', 31.104605, 77.173424,'823da7fffffffff'],
+      ['Delhi',28.644800,77.216721,"car",'Shimla', 31.104605, 77.173424,'823da7fffffffff',30.3165,78.0322],
       ['Shimla', 31.104605, 77.173424,"place",'Delhi',28.644800,77.216721,'823d17fffffffff']
     ]
   };
@@ -137,7 +139,7 @@ function Map() {
           },
           config: {
             visState: {
-              layers: [iconLayerConfig ,hexLayerConfig, lineLayerConfig],
+              layers: [iconLayerConfig ,hexLayerConfig, lineLayerConfig,pointLayerConfig],
           }
           }
         })

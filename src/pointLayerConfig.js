@@ -10,13 +10,13 @@ export const pointLayerConfig = {
             23
         ],
         columns: {
-            lat: "latitude",
-            lng: "longitude",
+            lat: "lat",
+            lng: "lng",
             altitude: ""
         },
         isVisible: true,
         visConfig: {
-            radius: 250,
+            radius: 50,
             // radiusBasedOn: "confirmed",
             // radiusField: 'confirmed',
             fixedRadius: false,
