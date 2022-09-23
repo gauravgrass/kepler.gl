@@ -75,6 +75,17 @@ function Map() {
   // console.log(example(28.644800, 77.216721));
   // console.log(example(31.104605, 77.173424));
 
+  const moreData ={
+    fields: [
+      {name: 'state', format: '', type: 'string'},
+      {name: 'lat', format: '', type: 'real'},
+      {name: 'lng', format: '', type: 'real'},
+    ],
+    rows: [
+      ['DehraDun',30.3165,78.0322]
+    ]
+  }
+
   const sampleTripData = {
     // fields: [
     //   {name: 'country', format: '', type: 'string'},
@@ -89,20 +100,19 @@ function Map() {
     // ],
     fields: [
       // {name: 'country', format: '', type: 'string'},
-      {name: 'from_state', format: '', type: 'string'},
+      {name: 'state', format: '', type: 'string'},
       {name: 'source_lat', format: '', type: 'real'},
       {name: 'source_lng', format: '', type: 'real'},
       {name: 'icon', format:'', type:'string'},
-      {name: 'to_state', format: '', type: 'string'},
       {name: 'target_lat', format: '', type: 'real'},
       {name: 'target_lng', format: '', type: 'real'},
       {name: 'hexagon_id', format: '', type: 'string'},
-      {name: 'lat', format: '', type: 'real'},
-      {name: 'lng', format: '', type: 'real'},
+      // {name: 'lat', format: '', type: 'real'},
+      // {name: 'lng', format: '', type: 'real'},
     ],
     rows: [
-      ['Delhi',28.644800,77.216721,"car",'Shimla', 31.104605, 77.173424,'823da7fffffffff',30.3165, 78.0322],
-      ['Shimla', 31.104605, 77.173424,"place",'Delhi',28.644800,77.216721,'823d17fffffffff']
+      ['Delhi',28.644800,77.216721,"car", 31.104605, 77.173424,'823da7fffffffff'],
+      ['Shimla', 31.104605, 77.173424,"place",28.644800,77.216721,'823d17fffffffff']
     ]
   };
 
@@ -124,28 +134,35 @@ function Map() {
 
   React.useEffect(() => {
     // console.log(data);
-    if (sampleTripData) {
-      dispatch(
-        addDataToMap({
-          datasets: {
-            info: {
-              label: "Covid_19",
-              id: "covid_19_data"
-            },
-            data: sampleTripData,
+
+    dispatch(addDataToMap({
+      datasets:[
+        {
+          info: {
+          label: "Covid",
+          id: "covid_19"
           },
-          option: {
-            centerMap: false,
+          data: moreData
+        },
+        {
+          info: {
+            label: "Covid_19",
+            id: "covid_19_data",
           },
-          config: {
-            visState: {
-              layers: [iconLayerConfig ,hexLayerConfig, lineLayerConfig,pointLayerConfig],
-          }
-          }
-        })
-      );
-    }
-  }, []);
+          data: sampleTripData
+        }
+      ] ,
+      option: {
+        centerMap: true,
+      },
+      config: {
+        visState: {
+          layers: [pointLayerConfig,iconLayerConfig ,hexLayerConfig, lineLayerConfig],
+      }
+      }
+    }))
+    
+  }, [sampleTripData, moreData , dispatch]);
 
   return (
     <div>

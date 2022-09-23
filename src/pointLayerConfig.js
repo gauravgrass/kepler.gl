@@ -2,8 +2,8 @@ export const pointLayerConfig = {
     // id: "hty62yd",
     type: "point",
     config: {
-        dataId: "covid_19_data",
-        label: "Covid 19",
+        dataId: "covid_19",
+        label: "Covid",
         color: [
             201,
             23,
