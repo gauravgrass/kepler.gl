@@ -101,7 +101,7 @@ function Map() {
       {name: 'lng', format: '', type: 'real'},
     ],
     rows: [
-      ['Delhi',28.644800,77.216721,"car",'Shimla', 31.104605, 77.173424,'823da7fffffffff',30.3165,78.0322],
+      ['Delhi',28.644800,77.216721,"car",'Shimla', 31.104605, 77.173424,'823da7fffffffff',30.3165, 78.0322],
       ['Shimla', 31.104605, 77.173424,"place",'Delhi',28.644800,77.216721,'823d17fffffffff']
     ]
   };
