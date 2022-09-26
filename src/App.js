@@ -9,7 +9,6 @@ import useSwr from "swr";
 import { pointLayerConfig } from "./pointLayerConfig";
 import {hexLayerConfig} from "./hexLayerConfig"
 import {latLngToCell} from "h3-js";
-import {clusterLayerConfig} from "./clusterLayerConfig"
 import {H3Layer, LineLayer} from "kepler.gl/layers";
 // import {MapControlFactory} from './map/map-control';
 import {connect} from 'react-redux';
