@@ -1,4 +1,5 @@
-import React from "react";
+import React ,{useState} from "react";
+import ReactDOM from 'react-dom/client';
 import keplerGlReducer from "kepler.gl/reducers";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { taskMiddleware } from "react-palm/tasks";
@@ -8,6 +9,7 @@ import { addDataToMap, toggleFullScreen } from "kepler.gl/actions";
 import useSwr from "swr";
 import { pointLayerConfig } from "./pointLayerConfig";
 import {hexLayerConfig} from "./hexLayerConfig"
+import {hexLayerConfigg} from "./hexLayerConfig1"
 import {latLngToCell} from "h3-js";
 import {H3Layer, LineLayer} from "kepler.gl/layers";
 // import {MapControlFactory} from './map/map-control';
@@ -18,6 +20,9 @@ import {iconLayerConfig} from './iconLayerConfig';
 import {updateMap} from 'kepler.gl/actions'
 // import {StyledLayerPanelHeader} from 'kepler.gl/src/components/side-panel/layer-panel/layer-panel-header';
 import './Button.css';
+import { func } from "prop-types";
+import {ActionTypes} from 'kepler.gl/actions';
+import {handleActions} from 'redux-actions';
 
 const keplerReducer = keplerGlReducer.initialState({
   uiState: {
@@ -40,14 +45,31 @@ const keplerReducer = keplerGlReducer.initialState({
       }    
   }
 });
+
+const appReducer = handleActions(
+  {
+    [ActionTypes.LAYER_CLICK]: (state, action) => {
+      console.log(action.payload.info.object.id);
+      return {
+      ...state,
+      viewport: action.payload
+    }}
+  },
+  {},
+);
+
+console.log(appReducer);
+
 const reducers = combineReducers({
+  app: appReducer,
   keplerGl: keplerReducer
 });
 
 const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
 
 
-export default function App() {
+function App(props) {
+    console.log("Rendered Again..........................", props);
   return (
     <Provider store={store}>
       <Map />
@@ -56,24 +78,28 @@ export default function App() {
 }
 
 function Map() {
-  const dispatch = useDispatch();
-  // const { data } = useSwr("covid", async () => {
-  //   const response = await fetch(
-  //     "https://json.extendsclass.com/bin/7a09b5ee4f37"
-  //   );
-  //   const data = await response.json();
-  //   console.log(data, response);
-  //   return data;
-  // });
-
+  
   // function example(lat, lng) {
-  //   const res = 2;
-  //   return latLngToCell(lat, lng, res);
+  //   return latLngToCell(lat, lng, 2);
   // }
 
-  // console.log(example(28.644800, 77.216721));
-  // console.log(example(31.104605, 77.173424));
-
+  // console.log(example(26.4499, 74.797371));
+  const dispatch = useDispatch();
+  const selected = {
+    fields: 
+    [
+      {name: 'state', format: '', type: 'string'},
+      {name: 'source_lat', format: '', type: 'real'},
+      {name: 'source_lng', format: '', type: 'real'},
+      // {name: 'icon', format:'', type:'string'},
+      // {name: 'target_lat', format: '', type: 'real'},
+      // {name: 'target_lng', format: '', type: 'real'},
+      {name: 'hexagon_id', format: '', type: 'string'}
+    ],
+    rows: [
+      // ['Srinagar',34.0837,74.7973,'823d37fffffffff']
+    ]
+  }
   const moreData ={
     fields: [
       {name: 'state', format: '', type: 'string'},
@@ -81,33 +107,19 @@ function Map() {
       {name: 'lng', format: '', type: 'real'},
     ],
     rows: [
-      ['DehraDun',30.3165,78.0322]
+      ['Haldwani',29.2183,79.5130]
     ]
   }
 
   const sampleTripData = {
-    // fields: [
-    //   {name: 'country', format: '', type: 'string'},
-    //   {name: 'state', format: '', type: 'string'},
-    //   {name: 'point_latitude', format: '', type: 'real'},
-    //   {name: 'point_logitude', format: '', type: 'real'},
-    //   {name: 'hexagon_id', format: '', type: 'string'}
-    // ],
-    // rows: [
-    //   ['India','Delhi',28.644800,77.216721,'823da7fffffffff'],
-    //   ['India', 'Shimla', 31.104605, 77.173424,'823d17fffffffff']
-    // ],
     fields: [
-      // {name: 'country', format: '', type: 'string'},
       {name: 'state', format: '', type: 'string'},
       {name: 'source_lat', format: '', type: 'real'},
       {name: 'source_lng', format: '', type: 'real'},
       {name: 'icon', format:'', type:'string'},
       {name: 'target_lat', format: '', type: 'real'},
       {name: 'target_lng', format: '', type: 'real'},
-      {name: 'hexagon_id', format: '', type: 'string'},
-      // {name: 'lat', format: '', type: 'real'},
-      // {name: 'lng', format: '', type: 'real'},
+      {name: 'hexagon_id', format: '', type: 'string'}
     ],
     rows: [
       ['Delhi',28.644800,77.216721,"car", 31.104605, 77.173424,'823da7fffffffff'],
@@ -115,27 +127,18 @@ function Map() {
     ]
   };
 
-  const mapStyles = [
-    {
-      id: 'my_dark_map',
-      label: 'Dark Streets 9',
-      url: 'mapbox://styles/mapbox/dark-v9',
-      icon: `https://d1a3f4spazzrp4.cloudfront.net/kepler.gl/icons/svg-icons.json`,
-      // layerGroups: [
-      //   {
-      //     slug: 'label',
-      //     filter: ({id}) => id.match(/(?=(label|place-|poi-))/),
-      //     defaultVisibility: true
-      //   },
-      // ]
-    }
-  ];
+  // const[selectedHex, setSelectedHex] = useState();
 
   React.useEffect(() => {
-    // console.log(data);
-
     dispatch(addDataToMap({
       datasets:[
+        // {
+        //   info: {
+        //     label: "Covid_19_srinagar",
+        //     id: "covid",
+        //   },
+        //   data: selectedHex
+        // },
         {
           info: {
           label: "Covid",
@@ -149,19 +152,20 @@ function Map() {
             id: "covid_19_data",
           },
           data: sampleTripData
-        }
+        },
       ] ,
       option: {
         centerMap: true,
       },
       config: {
         visState: {
-          layers: [pointLayerConfig,iconLayerConfig ,hexLayerConfig, lineLayerConfig],
+          layers: [pointLayerConfig,iconLayerConfig ,hexLayerConfig, lineLayerConfig, hexLayerConfigg],
       }
       }
     }))
     
-  }, [sampleTripData, moreData , dispatch]);
+  });
+
 
   return (
     <div>
@@ -174,10 +178,9 @@ function Map() {
       height={window.innerHeight}
       appName="Grassdoor"
       version=""
-      // mapStyles={mapStyles}
-      // mapStylesReplaceDefault={true} 
     />
     </div>
     
   );
 }
+export default App;
