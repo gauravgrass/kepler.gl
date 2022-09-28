@@ -1,75 +1,89 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-import {combineReducers, createStore, applyMiddleware, compose} from 'redux';
-// import {routerReducer, routerMiddleware} from 'react-router-redux';
-// import {browserHistory} from 'react-router';
-import {enhanceReduxMiddleware} from 'kepler.gl/middleware';
-// import thunk from 'redux-thunk';
-// eslint-disable-next-line no-unused-vars
-import window from 'global/window';
-import {handleActions} from 'redux-actions';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { taskMiddleware } from "react-palm/tasks";
 import {ActionTypes} from 'kepler.gl/actions';
+import {handleActions} from 'redux-actions';
+import keplerGlReducer, {visStateUpdaters} from 'kepler.gl/reducers';
+import {hexLayerConfigg} from "../hexLayerConfig1"
 
-// import demoReducer from './reducers/index';
 
-const appReducer = handleActions(
-    {
-      [ActionTypes.LAYER_CLICK]: (state, action) => {
-        console.log(action.payload.info.object.id);
-        return {
-        ...state,
-        viewport: action.payload
-      }}
-    },
-    {},
-  );
 
-const reducers = combineReducers({
-  demo: appReducer,
-//   routing: routerReducer
+const keplerReducer = keplerGlReducer.initialState({
+  uiState: {
+      activeSidePanel: null,  
+      currentModal: null,
+      mapControls: {
+        visibleLayers: {
+          show: false
+        },
+        mapLegend: {
+          show: false,
+          active: false
+        },
+        toggle3d: {
+          show: false
+        },
+        splitMap: {
+          show: false
+        }
+      }    
+  }
 });
 
-// export const middlewares = enhanceReduxMiddleware([thunk, routerMiddleware(browserHistory)]);
-
-// export const enhancers = [applyMiddleware(...middlewares)];
-
+const appReducer = handleActions(
+  {
+    // listen on kepler.gl map update action to store a copy of viewport in app state
+    [ActionTypes.LAYER_CLICK]: (state, action) => ({
+      
+    ...state,
+    keplerGl: {
+      ...state.keplerGl,
+      covid: {
+         ...state.keplerGl?.covid,
+         visState: visStateUpdaters.layerClickUpdater(
+          {
+            // state,
+            datasets:[
+              {
+                fields: 
+                [
+                  {name: 'state', format: '', type: 'string'},
+                  {name: 'source_lat', format: '', type: 'real'},
+                  {name: 'source_lng', format: '', type: 'real'},
+                  {name: 'hexagon_id', format: '', type: 'string'}
+                ],
+                rows: [
+                  ['Srinagar',34.0837,74.7973,'823d37fffffffff']
+                ]
+              }
+            ],
+          visState: {
+            layers: [hexLayerConfigg],
+          },
+            action:{
+            info: {
+              label: "Covid srinagar",
+              id: "covid"
+              }
+          }}
+         )
+      }
+    }
+    })
+  },
+  {}
+);
 const initialState = {};
 
-// eslint-disable-next-line prefer-const
-let composeEnhancers = compose;
+const reducers = combineReducers({
+    keplerGl: keplerReducer,
+    app: appReducer
+});
 
-/**
- * comment out code below to enable Redux Devtools
- */
 
-if (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
-  composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-    // actionsBlacklist: [
-    //   '@@kepler.gl/MOUSE_MOVE',
-    //   '@@kepler.gl/UPDATE_MAP',
-    //   '@@kepler.gl/LAYER_HOVER',
-    //   '@@kepler.gl/LAYER_CLICK',
-    //   '@@kepler.gl/MAP_CLICK'
-    // ]
-  });
-}
+// export const store = createStore(
+//     reducers,
+//     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 
-export default createStore(reducers, initialState);
+// )
+
+export const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));

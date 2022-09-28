@@ -1,6 +1,6 @@
 import React ,{useState, useEffect} from "react";
 import {Provider} from 'react-redux';
-import store from './store/store';
+import {store} from './store/store';
 import App from './App'
 function AppRender(){
     const[hexId,setHexId] = useState('');
@@ -8,10 +8,11 @@ function AppRender(){
         console.log('redered UseEffect')
     },[])
 console.log(hexId);
+// console.log(store.getState());
     return(
-        <Provider store={store}>
+        // <Provider store={store}>
             <App setHexId={setHexId} />
-        </Provider>  
+        // </Provider>  
     )
 }
 

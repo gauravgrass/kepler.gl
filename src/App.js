@@ -1,11 +1,11 @@
-import React ,{useState} from "react";
+import React ,{useEffect, useState} from "react";
 import ReactDOM from 'react-dom/client';
 import keplerGlReducer from "kepler.gl/reducers";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { taskMiddleware } from "react-palm/tasks";
 import { Provider, useDispatch } from "react-redux";
 import KeplerGl, {Layer} from "kepler.gl";
-import { addDataToMap, toggleFullScreen } from "kepler.gl/actions";
+import { addDataToMap, toggleFullScreen, onLayerClick } from "kepler.gl/actions";
 import useSwr from "swr";
 import { pointLayerConfig } from "./pointLayerConfig";
 import {hexLayerConfig} from "./hexLayerConfig"
@@ -24,52 +24,63 @@ import { func } from "prop-types";
 import {ActionTypes} from 'kepler.gl/actions';
 import {handleActions} from 'redux-actions';
 
+let updateOutside;
+
 const keplerReducer = keplerGlReducer.initialState({
   uiState: {
-      activeSidePanel: null,  
-      currentModal: null,
-      mapControls: {
-        visibleLayers: {
-          show: false
-        },
-        mapLegend: {
-          show: false,
-          active: false
-        },
-        toggle3d: {
-          show: false
-        },
-        splitMap: {
-          show: false
-        }
-      }    
+    activeSidePanel: null,
+    currentModal: null,
+    mapControls: {
+      visibleLayers: {
+        show: false
+      },
+      mapLegend: {
+        show: false,
+        active: false
+      },
+      toggle3d: {
+        show: false
+      },
+      splitMap: {
+        show: false
+      }
+    }
   }
 });
 
 const appReducer = handleActions(
   {
+    // listen on kepler.gl map update action to store a copy of viewport in app state
     [ActionTypes.LAYER_CLICK]: (state, action) => {
       console.log(action.payload.info.object.id);
+      // setHexId((hexId) => [...hexIds, hexId]);
+      updateOutside(action.payload.info.object.id);
       return {
-      ...state,
-      viewport: action.payload
-    }}
+        ...state,
+        viewport: action.payload
+      };
+    }
   },
-  {},
+  {}
 );
 
-console.log(appReducer);
-
 const reducers = combineReducers({
-  app: appReducer,
-  keplerGl: keplerReducer
+  keplerGl: keplerReducer,
+  app:appReducer
 });
 
-const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
+let store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
 
+export default function App() {
+  const [hexIds, setHexId] = useState('');
+  useEffect(() => {
+    /* Assign update to outside variable */
+    updateOutside = setHexId
 
-function App(props) {
-    console.log("Rendered Again..........................", props);
+    /* Unassign when component unmounts */
+    return () => updateOutside = null
+  })
+  console.log('.....................Hex iD iiiiiiiiiiissss',hexIds);
   return (
     <Provider store={store}>
       <Map />
@@ -130,6 +141,17 @@ function Map() {
   // const[selectedHex, setSelectedHex] = useState();
 
   React.useEffect(() => {
+    // dispatch(
+    //   onLayerClick({
+    //     info: {
+    //       label: "Covid_19",
+    //       id: "covid_19_data",
+    //     },
+    //     visState: {
+    //       layers: [pointLayerConfig,iconLayerConfig ,hexLayerConfig, lineLayerConfig, hexLayerConfigg],
+    //   }
+    //   })
+    // )
     dispatch(addDataToMap({
       datasets:[
         // {
@@ -169,8 +191,8 @@ function Map() {
 
   return (
     <div>
-      <button onClick={() => toggleFullScreen()}>
-      click</button>
+      {/* <button onClick={() => toggleFullScreen()}>
+      click</button> */}
       <KeplerGl
       id="covid"
       mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
@@ -183,4 +205,14 @@ function Map() {
     
   );
 }
-export default App;
+
+
+// const mapDispatchToProps=dispatch=>({
+  // addToCartHandler:data=>dispatch(addToCart(data))
+// })
+
+// export default connect(mapDispatchToProps)(App)
+
+// export default connect(mapDispatchToProps)(App);
+
+// export default App;
