@@ -1,9 +1,9 @@
-export const hexLayerConfig = {
+export const hexLayerConfigg = {
   type: 'hexagonId',
   config: {
-      dataId: "covid_19_data",
-      label: "Covid 19",
-    color: [0,46,255],
+      dataId: "covid",
+      label: "Covid 19 srinagar",
+    color: [255, 157, 0],
     columns: {
       hex_id: 'hexagon_id'
     },
